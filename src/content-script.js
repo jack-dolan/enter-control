@@ -2,6 +2,12 @@
   'use strict';
 
   let dispatching = false;
+  let sendKey = 'either';
+
+  chrome.storage.sync.get({ sendKey: 'either' }, (prefs) => { sendKey = prefs.sendKey; });
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.sendKey) sendKey = changes.sendKey.newValue;
+  });
 
   function isEditableTarget(el) {
     if (!el) return false;
@@ -15,11 +21,24 @@
     if (dispatching) return;
     if (e.key !== 'Enter') return;
     if (!isEditableTarget(e.target)) return;
+    if (e.shiftKey || e.altKey) return;
+
+    const hasCtrl = e.ctrlKey && !e.metaKey;
+    const hasMeta = e.metaKey && !e.ctrlKey;
+
+    let sendMode;
+    if (sendKey === 'ctrl') {
+      if (hasMeta) return;
+      sendMode = hasCtrl;
+    } else if (sendKey === 'meta') {
+      if (hasCtrl) return;
+      sendMode = hasMeta;
+    } else {
+      sendMode = e.ctrlKey || e.metaKey;
+    }
 
     e.preventDefault();
     e.stopImmediatePropagation();
-
-    const sendMode = e.ctrlKey || e.metaKey;
 
     const synthetic = new KeyboardEvent('keydown', {
       key: 'Enter',

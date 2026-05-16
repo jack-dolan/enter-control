@@ -14,6 +14,14 @@
     <p id="empty-state">No sites configured yet.<br>Add one below to get started.</p>
   </main>
   <footer>
+    <div class="setting-row">
+      <span class="setting-label">Send with</span>
+      <select id="select-send-key">
+        <option value="either">Ctrl or ⌘ + Enter</option>
+        <option value="ctrl">Ctrl+Enter</option>
+        <option value="meta">⌘+Enter</option>
+      </select>
+    </div>
     <div class="add-domain">
       <input id="input-domain" type="text" placeholder="e.g. chat.google.com" spellcheck="false" autocomplete="off">
       <button id="btn-add-domain">Add</button>

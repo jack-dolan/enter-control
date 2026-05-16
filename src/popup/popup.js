@@ -11,6 +11,15 @@ async function saveSites(sites) {
   await chrome.storage.sync.set({ sites });
 }
 
+async function getSendKey() {
+  const { sendKey = 'either' } = await chrome.storage.sync.get('sendKey');
+  return sendKey;
+}
+
+async function saveSendKey(value) {
+  await chrome.storage.sync.set({ sendKey: value });
+}
+
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 function generateId() {
@@ -70,6 +79,24 @@ async function unregisterScript(site) {
 
 // ── Add sites ─────────────────────────────────────────────────────────────────
 
+async function completePendingSite() {
+  const { pendingSite } = await chrome.storage.session.get('pendingSite');
+  if (!pendingSite) return;
+  const { domain, faviconSourceUrl } = pendingSite;
+  await chrome.storage.session.remove('pendingSite');
+
+  const hasPermission = await chrome.permissions.contains({ origins: [`*://${domain}/*`] });
+  if (!hasPermission) return;
+
+  const sites = await getSites();
+  if (sites.some((s) => s.domain === domain)) return;
+
+  const faviconUrl = await toDataUri(faviconSourceUrl || `https://${domain}/favicon.ico`);
+  const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
+  await saveSites([...sites, site]);
+  await registerScript(site);
+}
+
 async function addSite(domain, faviconSourceUrl = '') {
   const sites = await getSites();
   if (sites.some((s) => s.domain === domain)) {
@@ -77,18 +104,23 @@ async function addSite(domain, faviconSourceUrl = '') {
     return false;
   }
 
+  // Stash intent before the permission dialog — the popup may close during it
+  await chrome.storage.session.set({ pendingSite: { domain, faviconSourceUrl: faviconSourceUrl || '' } });
+
   let granted;
   try {
     granted = await chrome.permissions.request({ origins: [`*://${domain}/*`] });
   } catch (err) {
     console.error('Permission request failed:', err);
+    await chrome.storage.session.remove('pendingSite');
     return false;
   }
+
+  // Popup survived the dialog — clear the stash and finish here
+  await chrome.storage.session.remove('pendingSite');
   if (!granted) return false;
 
-  // Fetch favicon now that we have host permission
   const faviconUrl = await toDataUri(faviconSourceUrl || `https://${domain}/favicon.ico`);
-
   const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
   await saveSites([...sites, site]);
   await registerScript(site);
@@ -220,13 +252,22 @@ async function render() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-document.getElementById('btn-add-current').addEventListener('click', addCurrentSite);
-document.getElementById('btn-add-domain').addEventListener('click', addByDomain);
-document.getElementById('input-domain').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') addByDomain();
-});
-document.getElementById('input-domain').addEventListener('input', (e) => {
-  e.target.classList.remove('error');
-});
+async function init() {
+  document.getElementById('btn-add-current').addEventListener('click', addCurrentSite);
+  document.getElementById('btn-add-domain').addEventListener('click', addByDomain);
+  document.getElementById('input-domain').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addByDomain();
+  });
+  document.getElementById('input-domain').addEventListener('input', (e) => {
+    e.target.classList.remove('error');
+  });
 
-render();
+  const sendKeySelect = document.getElementById('select-send-key');
+  sendKeySelect.value = await getSendKey();
+  sendKeySelect.addEventListener('change', () => saveSendKey(sendKeySelect.value));
+
+  await completePendingSite();
+  await render();
+}
+
+init();
