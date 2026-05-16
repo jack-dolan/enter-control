@@ -2,8 +2,18 @@
 
 // ── Icon / title constants ────────────────────────────────────────────────────
 
-const ICON_ACTIVE   = { 16: 'icons/action_active16.png', 24: 'icons/action_active24.png', 32: 'icons/action_active32.png' };
-const ICON_INACTIVE = { 16: 'icons/action16.png',        24: 'icons/action24.png',        32: 'icons/action32.png'        };
+// Use chrome.runtime.getURL so paths are absolute chrome-extension:// URLs —
+// relative strings resolve from the service worker file location, not the root.
+const ICON_ACTIVE = {
+  16: chrome.runtime.getURL('icons/action_active16.png'),
+  24: chrome.runtime.getURL('icons/action_active24.png'),
+  32: chrome.runtime.getURL('icons/action_active32.png'),
+};
+const ICON_INACTIVE = {
+  16: chrome.runtime.getURL('icons/action16.png'),
+  24: chrome.runtime.getURL('icons/action24.png'),
+  32: chrome.runtime.getURL('icons/action32.png'),
+};
 const TITLE_ACTIVE   = 'Enter Control: active on this site';
 const TITLE_INACTIVE = 'Enter Control: inactive on this site';
 
@@ -22,10 +32,10 @@ async function updateTabIcon(tabId) {
   let tab;
   try { tab = await chrome.tabs.get(tabId); } catch (_) { return; }
   const active = await isActiveOnTab(tab);
-  await Promise.all([
-    chrome.action.setIcon({ tabId, path: active ? ICON_ACTIVE : ICON_INACTIVE }).catch(() => {}),
-    chrome.action.setTitle({ tabId, title: active ? TITLE_ACTIVE : TITLE_INACTIVE }).catch(() => {}),
-  ]);
+  try {
+    await chrome.action.setIcon({ tabId, path: active ? ICON_ACTIVE : ICON_INACTIVE });
+    await chrome.action.setTitle({ tabId, title: active ? TITLE_ACTIVE : TITLE_INACTIVE });
+  } catch (_) { /* tab was closed between the get and the set */ }
 }
 
 async function updateAllTabs() {
