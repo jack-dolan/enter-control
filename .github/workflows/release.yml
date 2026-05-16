@@ -14,11 +14,33 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
+
+      - name: Verify manifest version matches tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          EXPECTED="${TAG#v}"
+          ACTUAL=$(node -p "require('./manifest.json').version")
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::Tag $TAG does not match manifest.json version $ACTUAL — update manifest.json before tagging"
+            exit 1
+          fi
+
       - name: Build extension zip
         run: |
-          mkdir dist
-          zip -r "dist/enter-control-${{ github.ref_name }}.zip" manifest.json src/
-          test -d icons && zip -r "dist/enter-control-${{ github.ref_name }}.zip" icons/ || true
+          mkdir -p dist
+          zip -r "dist/enter-control-${{ github.ref_name }}.zip" manifest.json src/ icons/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3

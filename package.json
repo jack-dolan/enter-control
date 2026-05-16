@@ -5,7 +5,8 @@
   "description": "Chrome extension: swap Enter / Ctrl+Enter on configured sites",
   "scripts": {
     "lint": "eslint src/",
-    "audit": "npm audit --audit-level=moderate"
+    "audit": "npm audit --audit-level=moderate",
+    "zip": "rm -rf dist && mkdir -p dist && zip -r dist/enter-control.zip manifest.json src/ icons/"
   },
   "devDependencies": {
     "eslint": "^10.4.0",
