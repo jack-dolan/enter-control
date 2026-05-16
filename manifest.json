@@ -5,6 +5,7 @@
   "description": "Swaps Enter and Ctrl+Enter on configured sites: Enter inserts a newline, Ctrl+Enter sends.",
   "icons": {
     "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
@@ -14,6 +15,12 @@
     "service_worker": "src/background.js"
   },
   "action": {
-    "default_popup": "src/popup/popup.html"
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/action16.png",
+      "24": "icons/action24.png",
+      "32": "icons/action32.png"
+    },
+    "default_title": "Enter Control"
   }
 }
