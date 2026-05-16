@@ -31,8 +31,6 @@ No broad host access is declared at install time.
 
 When you add a site, Enter Control calls `chrome.permissions.request()` for that specific domain, then uses `chrome.scripting.registerContentScripts()` to inject a lightweight content script. The script intercepts `keydown` events in capture phase: bare `Enter` becomes `Shift+Enter` (newline), and `Ctrl+Enter` becomes bare `Enter` (send).
 
-## Roadmap
+## Chrome Web Store
 
-- **Phase 2** — custom site names, favicon persistence as data URIs, manual domain entry
-- **Phase 3** — GitHub Actions CI/CD (CodeQL, Dependabot, release packaging)
-- **Phase 4** — Chrome Web Store listing and publication
+Publication is the next milestone.
