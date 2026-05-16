@@ -69,6 +69,13 @@ async function registerScript(site) {
     runAt: 'document_idle',
     allFrames: false,
   }]);
+
+  // Inject into any already-open tabs on this domain so they don't need a refresh
+  const tabs = await chrome.tabs.query({ url: `*://${site.domain}/*` });
+  await Promise.all(tabs.map((tab) =>
+    chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/content-script.js'] })
+      .catch(() => {})
+  ));
 }
 
 async function unregisterScript(site) {

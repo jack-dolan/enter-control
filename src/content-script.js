@@ -1,6 +1,9 @@
 (function () {
   'use strict';
 
+  if (window.__enterControlActive) return;
+  window.__enterControlActive = true;
+
   let dispatching = false;
   let sendKey = 'either';
 
