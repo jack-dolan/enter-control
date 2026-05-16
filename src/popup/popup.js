@@ -38,23 +38,6 @@ function normalizeToHostname(input) {
   }
 }
 
-async function toDataUri(url) {
-  if (!url) return '';
-  if (url.startsWith('data:')) return url;
-  try {
-    const resp = await fetch(url);
-    if (!resp.ok) return url;
-    const blob = await resp.blob();
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => resolve(url);
-      reader.readAsDataURL(blob);
-    });
-  } catch (_) {
-    return url;
-  }
-}
 
 // ── Script registration ───────────────────────────────────────────────────────
 
@@ -91,7 +74,7 @@ async function completePendingSite() {
   const sites = await getSites();
   if (sites.some((s) => s.domain === domain)) return;
 
-  const faviconUrl = await toDataUri(faviconSourceUrl || `https://${domain}/favicon.ico`);
+  const faviconUrl = faviconSourceUrl || `https://${domain}/favicon.ico`;
   const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
   await saveSites([...sites, site]);
   await registerScript(site);
@@ -120,7 +103,7 @@ async function addSite(domain, faviconSourceUrl = '') {
   await chrome.storage.session.remove('pendingSite');
   if (!granted) return false;
 
-  const faviconUrl = await toDataUri(faviconSourceUrl || `https://${domain}/favicon.ico`);
+  const faviconUrl = faviconSourceUrl || `https://${domain}/favicon.ico`;
   const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
   await saveSites([...sites, site]);
   await registerScript(site);
