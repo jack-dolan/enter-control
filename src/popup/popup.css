@@ -269,3 +269,9 @@ footer {
 #btn-add-current:active {
   background: #0d47a1;
 }
+
+.msg-error {
+  font-size: 11px;
+  color: #c5221f;
+  padding: 0 4px;
+}

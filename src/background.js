@@ -79,7 +79,7 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
       const tabs = await chrome.tabs.query({ url: `*://${site.domain}/*` });
       await Promise.all(
         tabs.map((tab) =>
-          chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/content-script.js'] })
+          chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: false }, files: ['src/content-script.js'] })
             .catch(() => {})
         )
       );
@@ -98,7 +98,7 @@ chrome.permissions.onAdded.addListener(async ({ origins }) => {
     const tabs = await chrome.tabs.query({ url: `*://${match[1]}/*` });
     await Promise.all(
       tabs.map((tab) =>
-        chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/content-script.js'] })
+        chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: false }, files: ['src/content-script.js'] })
           .catch(() => {})
       )
     );

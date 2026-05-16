@@ -2,12 +2,14 @@
   'use strict';
 
   // Guard against double-injection (e.g. executeScript on an already-loaded tab).
-  // The existing instance's storage listener handles state updates instead.
-  if (window.__enterControlActive !== undefined) return;
-  window.__enterControlActive = true;
+  // Key includes the extension ID so arbitrary pages cannot pre-set it.
+  const _GUARD = `__ec_${chrome.runtime.id}`;
+  if (window[_GUARD]) return;
+  window[_GUARD] = true;
 
   let dispatching = false;
   let active = false;
+  const VALID_SEND_KEYS = new Set(['ctrl', 'meta', 'either']);
   let sendKey = 'either';
 
   function getHostname() {
@@ -19,7 +21,7 @@
     if (!hostname) { active = false; return; }
     const { sites = [], sendKey: sk = 'either' } = await chrome.storage.sync.get(['sites', 'sendKey']);
     active = sites.some((s) => s.domain === hostname && s.enabled);
-    sendKey = sk;
+    sendKey = VALID_SEND_KEYS.has(sk) ? sk : 'either';
   }
 
   // Seed state immediately, then keep it in sync as storage changes.

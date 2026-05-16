@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Enter Control",
   "version": "0.1.0",
+  "minimum_chrome_version": "96",
   "description": "Per-site Enter key control for messaging apps. Enter creates a new line; Ctrl+Enter or ⌘+Enter sends. No more accidental sends.",
   "icons": {
     "16": "icons/icon16.png",

@@ -23,7 +23,7 @@ async function saveSendKey(value) {
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  return crypto.randomUUID();
 }
 
 function normalizeToHostname(input) {
@@ -32,12 +32,19 @@ function normalizeToHostname(input) {
   try {
     const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
     const { hostname } = new URL(withProto);
-    return hostname || null;
+    if (!hostname || /[*?]/.test(hostname)) return null;
+    return hostname;
   } catch (_) {
     return null;
   }
 }
 
+function showInlineError(msg) {
+  const el = document.getElementById('msg-error');
+  el.textContent = msg;
+  el.hidden = false;
+  setTimeout(() => { el.hidden = true; }, 4000);
+}
 
 // ── Script registration ───────────────────────────────────────────────────────
 
@@ -65,7 +72,7 @@ async function unregisterScript(site) {
 async function completePendingSite() {
   const { pendingSite } = await chrome.storage.session.get('pendingSite');
   if (!pendingSite) return;
-  const { domain, faviconSourceUrl } = pendingSite;
+  const { domain } = pendingSite;
   await chrome.storage.session.remove('pendingSite');
 
   const hasPermission = await chrome.permissions.contains({ origins: [`*://${domain}/*`] });
@@ -74,21 +81,21 @@ async function completePendingSite() {
   const sites = await getSites();
   if (sites.some((s) => s.domain === domain)) return;
 
-  const faviconUrl = faviconSourceUrl || `https://${domain}/favicon.ico`;
+  const faviconUrl = `https://${domain}/favicon.ico`;
   const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
   await saveSites([...sites, site]);
   await registerScript(site);
 }
 
-async function addSite(domain, faviconSourceUrl = '') {
+async function addSite(domain) {
   const sites = await getSites();
   if (sites.some((s) => s.domain === domain)) {
-    alert(`${domain} is already in your list.`);
+    showInlineError(`${domain} is already in your list.`);
     return false;
   }
 
   // Stash intent before the permission dialog — the popup may close during it
-  await chrome.storage.session.set({ pendingSite: { domain, faviconSourceUrl: faviconSourceUrl || '' } });
+  await chrome.storage.session.set({ pendingSite: { domain } });
 
   let granted;
   try {
@@ -103,7 +110,7 @@ async function addSite(domain, faviconSourceUrl = '') {
   await chrome.storage.session.remove('pendingSite');
   if (!granted) return false;
 
-  const faviconUrl = faviconSourceUrl || `https://${domain}/favicon.ico`;
+  const faviconUrl = `https://${domain}/favicon.ico`;
   const site = { id: generateId(), domain, name: domain, faviconUrl, enabled: true };
   await saveSites([...sites, site]);
   await registerScript(site);
@@ -117,7 +124,7 @@ async function addCurrentSite() {
   let url;
   try { url = new URL(tab.url); } catch (_) { return; }
   if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
-  await addSite(url.hostname, tab.favIconUrl);
+  await addSite(url.hostname);
 }
 
 async function addByDomain() {
