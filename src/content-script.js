@@ -1,15 +1,31 @@
 (function () {
   'use strict';
 
-  if (window.__enterControlActive) return;
+  // Guard against double-injection (e.g. executeScript on an already-loaded tab).
+  // The existing instance's storage listener handles state updates instead.
+  if (window.__enterControlActive !== undefined) return;
   window.__enterControlActive = true;
 
   let dispatching = false;
+  let active = false;
   let sendKey = 'either';
 
-  chrome.storage.sync.get({ sendKey: 'either' }, (prefs) => { sendKey = prefs.sendKey; });
+  function getHostname() {
+    try { return new URL(location.href).hostname; } catch (_) { return ''; }
+  }
+
+  async function syncState() {
+    const hostname = getHostname();
+    if (!hostname) { active = false; return; }
+    const { sites = [], sendKey: sk = 'either' } = await chrome.storage.sync.get(['sites', 'sendKey']);
+    active = sites.some((s) => s.domain === hostname && s.enabled);
+    sendKey = sk;
+  }
+
+  // Seed state immediately, then keep it in sync as storage changes.
+  syncState();
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'sync' && changes.sendKey) sendKey = changes.sendKey.newValue;
+    if (area === 'sync' && (changes.sites || changes.sendKey)) syncState();
   });
 
   function isEditableTarget(el) {
@@ -21,6 +37,7 @@
   }
 
   document.addEventListener('keydown', (e) => {
+    if (!active) return;
     if (dispatching) return;
     if (e.key !== 'Enter') return;
     if (!isEditableTarget(e.target)) return;

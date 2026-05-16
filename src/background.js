@@ -63,8 +63,28 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 });
 
 // Site list or settings changed in the popup
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && changes.sites) updateAllTabs();
+chrome.storage.onChanged.addListener(async (changes, area) => {
+  if (area !== 'sync') return;
+  if (changes.sites) {
+    updateAllTabs();
+
+    // For any site that just became active, retry injecting into open tabs.
+    // onAdded can fire before Chrome finishes propagating the permission, so the
+    // first executeScript attempt may have failed silently. By this point the
+    // permission is confirmed (registerContentScripts just succeeded in the popup).
+    const newSites = changes.sites.newValue || [];
+    const oldDomains = new Set((changes.sites.oldValue || []).map((s) => s.domain));
+    const added = newSites.filter((s) => s.enabled && !oldDomains.has(s.domain));
+    for (const site of added) {
+      const tabs = await chrome.tabs.query({ url: `*://${site.domain}/*` });
+      await Promise.all(
+        tabs.map((tab) =>
+          chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/content-script.js'] })
+            .catch(() => {})
+        )
+      );
+    }
+  }
 });
 
 // ── Content script injection ──────────────────────────────────────────────────

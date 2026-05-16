@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Enter Control",
   "version": "0.1.0",
-  "description": "Swaps Enter and Ctrl+Enter on configured sites: Enter inserts a newline, Ctrl+Enter sends.",
+  "description": "Per-site Enter key control for messaging apps. Enter creates a new line; Ctrl+Enter or ⌘+Enter sends. No more accidental sends.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
