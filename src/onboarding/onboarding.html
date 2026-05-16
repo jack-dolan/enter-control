@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to Enter Control</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 560px;
+      margin: 60px auto;
+      padding: 0 24px 60px;
+      color: #202124;
+      line-height: 1.6;
+    }
+    h1 { font-size: 26px; margin-bottom: 8px; font-weight: 600; }
+    h2 { font-size: 15px; font-weight: 600; margin: 28px 0 8px; color: #202124; }
+    p { color: #5f6368; margin-bottom: 12px; font-size: 14px; }
+    kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      background: #f1f3f4;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #202124;
+    }
+    .step {
+      padding: 14px 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 3px solid #1a73e8;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    .step strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #202124;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Enter Control</h1>
+  <p>Stop sending half-finished messages. Enter Control swaps <kbd>Enter</kbd> and <kbd>Ctrl+Enter</kbd> on sites you choose — Enter inserts a new line, Ctrl+Enter sends.</p>
+
+  <h2>Getting started</h2>
+  <div class="step">
+    <strong>1. Go to a site you want to configure</strong>
+    Open Google Chat, Teams, or any messaging app where you want the key swap active.
+  </div>
+  <div class="step">
+    <strong>2. Click the Enter Control icon in your toolbar</strong>
+    If you don't see it, click the puzzle piece icon and pin Enter Control.
+  </div>
+  <div class="step">
+    <strong>3. Click "Add current site"</strong>
+    Chrome will ask you to confirm access to that domain. After you approve, the swap is active immediately — no reload needed.
+  </div>
+
+  <h2>Permissions</h2>
+  <p>Enter Control requests access <strong>only to sites you explicitly add</strong>. It never reads your messages or any page content — it only intercepts <kbd>Enter</kbd> key events inside text inputs.</p>
+
+  <h2>Managing sites</h2>
+  <p>Open the extension popup anytime to toggle individual sites on/off or remove them entirely. Removing a site also revokes its host permission.</p>
+</body>
+</html>

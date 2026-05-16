@@ -1,0 +1,13 @@
+{
+  "name": "enter-control",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension: swap Enter / Ctrl+Enter on configured sites",
+  "scripts": {
+    "lint": "eslint src/",
+    "audit": "npm audit --audit-level=moderate"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  }
+}

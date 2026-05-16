@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Enter Control",
+  "version": "0.1.0",
+  "description": "Swaps Enter and Ctrl+Enter on configured sites: Enter inserts a newline, Ctrl+Enter sends.",
+  "permissions": ["storage", "scripting", "activeTab", "tabs"],
+  "optional_host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html"
+  }
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enter Control</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>Enter Control</h1>
+  </header>
+  <main>
+    <div id="site-list"></div>
+    <p id="empty-state">No sites configured yet.<br>Add one below to get started.</p>
+  </main>
+  <footer>
+    <div class="add-domain">
+      <input id="input-domain" type="text" placeholder="e.g. chat.google.com" spellcheck="false" autocomplete="off">
+      <button id="btn-add-domain">Add</button>
+    </div>
+    <button id="btn-add-current">+ Add current site</button>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>
