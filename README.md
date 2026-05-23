@@ -18,9 +18,9 @@ Works on any site you choose — Google Chat, Slack, Teams, Discord, and more. T
 
 ## Install
 
-> Chrome Web Store listing coming soon.
+Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/enter-control/TODO_REPLACE_WITH_EXTENSION_ID).
 
-In the meantime, install from a release zip:
+Or install manually from a release zip:
 
 1. Download the latest `.zip` from [Releases](https://github.com/jack-dolan/enter-control/releases) and unzip it
 2. Open Chrome and navigate to `chrome://extensions`

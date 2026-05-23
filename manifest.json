@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Enter Control",
-  "version": "0.1.0",
-  "minimum_chrome_version": "96",
+  "version": "0.1.1",
+  "minimum_chrome_version": "102",
   "description": "Per-site Enter key control for messaging apps. Enter creates a new line; Ctrl+Enter or ⌘+Enter sends. No more accidental sends.",
+  "homepage_url": "https://github.com/jack-dolan/enter-control",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
